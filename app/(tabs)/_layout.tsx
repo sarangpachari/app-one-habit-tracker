@@ -1,43 +1,53 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
+import { Tabs } from "expo-router";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
+export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        headerStyle: { backgroundColor: "#44821579" },
+        headerShadowVisible: false,
+        tabBarActiveTintColor: "#448215d0",
+        tabBarInactiveTintColor: "#000000",
+        tabBarStyle: {
+          backgroundColor: "#4482150f",
+          paddingTop: 10,
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: "Today's Habits",
+          tabBarIcon: ({ color, size }) => (
+            <AntDesign name="calendar" size={size} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="streaks"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: "Streaks",
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome name="line-chart" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="add-habit"
+        options={{
+          title: "Add Habit",
+          tabBarIcon: ({ color, size, focused }) => {
+            if (focused) {
+              return <AntDesign name="pluscircle" size={size} color={color} />;
+            } else {
+              return <AntDesign name="pluscircleo" size={size} color={color} />;
+            }
+          },
         }}
       />
     </Tabs>
