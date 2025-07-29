@@ -3,13 +3,13 @@ import { useAuth } from "@/lib/auth-context";
 import { ID } from "appwrite";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import {
-    Button,
-    SegmentedButtons,
-    Text,
-    TextInput,
-    useTheme,
+  Button,
+  SegmentedButtons,
+  Text,
+  TextInput,
+  useTheme,
 } from "react-native-paper";
 
 const FREQUENCIES = ["daily", "weekly", "monthly"];
@@ -43,6 +43,13 @@ export default function AddHabitScreen() {
           created_at: new Date().toISOString(),
         }
       );
+
+      setTitle("");
+      setDescription("");
+      setError("");
+      setFrequency("daily");
+      Alert.alert("Success", "Habit created!");
+      router.back();
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -51,8 +58,6 @@ export default function AddHabitScreen() {
 
       setError("There was an error creating the habit.");
     }
-
-    router.back();
   };
 
   return (
