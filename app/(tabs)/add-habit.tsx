@@ -44,10 +44,7 @@ export default function AddHabitScreen() {
         }
       );
 
-      setTitle("");
-      setDescription("");
-      setError("");
-      setFrequency("daily");
+      setError("")
       Alert.alert("Success", "Habit created!");
       router.back();
     } catch (error) {
