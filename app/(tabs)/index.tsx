@@ -8,14 +8,18 @@ import {
 import { useAuth } from "@/lib/auth-context";
 import { Habit } from "@/types/database.type";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { Query } from "appwrite";
-import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import { Button, Surface, Text } from "react-native-paper";
 
 export default function Index() {
   const { signOut, user } = useAuth();
   const [habits, setHabits] = useState<Habit[]>();
+
+  const swipeableRefs = useRef<{ [key: string]: Swipeable | null }>({});
 
   const fetchHabits = async () => {
     try {
@@ -65,6 +69,32 @@ export default function Index() {
     }
   }, [user]);
 
+  //SWIPE ACTION RIGHT
+  const renderRightActions = () => {
+    return (
+      <View style={styles.swipeActionRight}>
+        <MaterialCommunityIcons
+          name="check-circle-outline"
+          size={32}
+          color="#fff"
+        />
+      </View>
+    );
+  };
+
+  //SWIPE ACTION LEFT
+  const renderLeftActions = () => {
+    return (
+      <View style={styles.swipeActionLeft}>
+        <MaterialCommunityIcons
+          name="trash-can-outline"
+          size={32}
+          color="#fff"
+        />
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -76,37 +106,52 @@ export default function Index() {
         </Button>
       </View>
 
-      {habits?.length === 0 ? (
-        <View style={styles.emptyState}>
-          <Text variant="headlineSmall" style={styles.emptyStateText}>
-            No Habits yet. Add your first Habit!
-          </Text>
-        </View>
-      ) : (
-        habits?.map((habit, key) => (
-          <Surface key={key} style={styles.card} elevation={0}>
-            <View style={styles.cardContent}>
-              <Text style={styles.cardTitle}>{habit?.title}</Text>
-              <Text style={styles.cardDescription}>{habit?.description}</Text>
-              <View style={styles.cardFooter}>
-                <View style={styles.streakBadge}>
-                  <FontAwesome5 name="fire" size={18} color="#ff9800" />
-                  <Text style={styles.streakText}>
-                    {" "}
-                    {habit?.streak_count} Day streak
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {habits?.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Text variant="headlineSmall" style={styles.emptyStateText}>
+              No Habits yet. Add your first Habit!
+            </Text>
+          </View>
+        ) : (
+          habits?.map((habit, key) => (
+            <Swipeable
+              key={key}
+              ref={(ref) => {
+                swipeableRefs.current[habit.$id] = ref;
+              }}
+              overshootLeft={false}
+              overshootRight={false}
+              renderLeftActions={renderLeftActions}
+              renderRightActions={renderRightActions}
+            >
+              <Surface style={styles.card} elevation={0}>
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardTitle}>{habit?.title}</Text>
+                  <Text style={styles.cardDescription}>
+                    {habit?.description}
                   </Text>
+                  <View style={styles.cardFooter}>
+                    <View style={styles.streakBadge}>
+                      <FontAwesome5 name="fire" size={18} color="#ff9800" />
+                      <Text style={styles.streakText}>
+                        {" "}
+                        {habit?.streak_count} Day streak
+                      </Text>
+                    </View>
+                    <View style={styles.frequencyBadge}>
+                      <Text style={styles.frequencyText}>
+                        {habit?.frequency.charAt(0).toUpperCase() +
+                          habit.frequency.slice(1)}
+                      </Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={styles.frequencyBadge}>
-                  <Text style={styles.frequencyText}>
-                    {habit?.frequency.charAt(0).toUpperCase() +
-                      habit.frequency.slice(1)}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </Surface>
-        ))
-      )}
+              </Surface>
+            </Swipeable>
+          ))
+        )}
+      </ScrollView>
     </View>
   );
 }
@@ -180,12 +225,32 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
-  emptyState:{
+  emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
-  emptyStateText:{
-    color:"#666666"
-  }
+  emptyStateText: {
+    color: "#666666",
+  },
+  swipeActionRight: {
+    justifyContent: "center",
+    alignItems: "flex-end",
+    flex: 1,
+    backgroundColor: "#4caf50",
+    borderRadius: 18,
+    marginBottom: 18,
+    marginTop: 2,
+    paddingRight: 16,
+  },
+  swipeActionLeft: {
+    justifyContent: "center",
+    alignItems: "flex-start",
+    flex: 1,
+    backgroundColor: "#e53935",
+    borderRadius: 18,
+    marginBottom: 18,
+    marginTop: 2,
+    paddingLeft: 16,
+  },
 });
